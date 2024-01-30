@@ -111,10 +111,8 @@ internal class RoomMemberListFetcher(
                     val chunk = iterator.nextChunk(pageSize.toUInt())
                     val members = try {
                         // Load next chunk. If null (no more items), exit the loop
-                        chunk?.parallelMap(RoomMemberMapper::map) ?: break
+                        chunk?.parallelMap(ExportedRoomMemberMapper::map) ?: break
                     } finally {
-                        // Make sure we clear all member references
-                        chunk?.destroyAll()
                     }
                     addAll(members)
                     Timber.i("Emitting first $size members for room $roomId")
