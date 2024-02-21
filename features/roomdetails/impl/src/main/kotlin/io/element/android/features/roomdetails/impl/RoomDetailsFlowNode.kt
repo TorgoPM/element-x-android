@@ -30,6 +30,7 @@ import dagger.assisted.AssistedInject
 import io.element.android.anvilannotations.ContributesNode
 import io.element.android.features.poll.api.history.PollHistoryEntryPoint
 import io.element.android.features.roomdetails.api.RoomDetailsEntryPoint
+import io.element.android.features.roomdetails.impl.admin.RoomDetailsAdminSettingsFlowNode
 import io.element.android.features.roomdetails.impl.edit.RoomDetailsEditNode
 import io.element.android.features.roomdetails.impl.invite.RoomInviteMembersNode
 import io.element.android.features.roomdetails.impl.members.RoomMemberListNode
@@ -91,6 +92,9 @@ class RoomDetailsFlowNode @AssistedInject constructor(
 
         @Parcelize
         data object PollHistory : NavTarget
+
+        @Parcelize
+        data object AdminSettings : NavTarget
     }
 
     override fun resolve(navTarget: NavTarget, buildContext: BuildContext): Node {
@@ -119,6 +123,10 @@ class RoomDetailsFlowNode @AssistedInject constructor(
 
                     override fun openPollHistory() {
                         backstack.push(NavTarget.PollHistory)
+                    }
+
+                    override fun openAdminSettings() {
+                        backstack.push(NavTarget.AdminSettings)
                     }
                 }
                 createNode<RoomDetailsNode>(buildContext, listOf(roomDetailsCallback))
@@ -188,6 +196,10 @@ class RoomDetailsFlowNode @AssistedInject constructor(
 
             is NavTarget.PollHistory -> {
                 pollHistoryEntryPoint.createNode(this, buildContext)
+            }
+
+            is NavTarget.AdminSettings -> {
+                createNode<RoomDetailsAdminSettingsFlowNode>(buildContext)
             }
         }
     }

@@ -91,6 +91,10 @@ interface MatrixRoom : Closeable {
 
     suspend fun unsubscribeFromSync()
 
+    suspend fun userRole(userId: UserId): Result<RoomMember.Role>
+
+    suspend fun updateUserRole(userId: UserId, role: RoomMember.Role): Result<Unit>
+
     suspend fun userDisplayName(userId: UserId): Result<String?>
 
     suspend fun userAvatarUrl(userId: UserId): Result<String?>

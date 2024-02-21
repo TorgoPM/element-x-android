@@ -36,6 +36,7 @@ import io.element.android.libraries.matrix.api.room.MatrixRoomMembersState
 import io.element.android.libraries.matrix.api.room.MatrixRoomNotificationSettingsState
 import io.element.android.libraries.matrix.api.room.Mention
 import io.element.android.libraries.matrix.api.room.MessageEventType
+import io.element.android.libraries.matrix.api.room.RoomMember
 import io.element.android.libraries.matrix.api.room.StateEventType
 import io.element.android.libraries.matrix.api.room.location.AssetType
 import io.element.android.libraries.matrix.api.room.roomNotificationSettings
@@ -51,6 +52,7 @@ import io.element.android.libraries.matrix.impl.notificationsettings.RustNotific
 import io.element.android.libraries.matrix.impl.poll.toInner
 import io.element.android.libraries.matrix.impl.room.location.toInner
 import io.element.android.libraries.matrix.impl.room.member.RoomMemberListFetcher
+import io.element.android.libraries.matrix.impl.room.member.RoomMemberMapper
 import io.element.android.libraries.matrix.impl.timeline.RustMatrixTimeline
 import io.element.android.libraries.matrix.impl.timeline.toRustReceiptType
 import io.element.android.libraries.matrix.impl.util.mxCallbackFlow
@@ -225,6 +227,25 @@ class RustMatrixRoom(
                 prevRoomNotificationSettings = currentRoomNotificationSettings,
                 failure = it
             )
+        }
+    }
+
+    override suspend fun userRole(userId: UserId): Result<RoomMember.Role> = withContext(coroutineDispatchers.io) {
+        runCatching {
+            innerRoom.member(userId.value).use { member ->
+                RoomMemberMapper.mapRole(member.suggestedRoleForPowerLevel())
+            }
+        }
+    }
+
+    override suspend fun updateUserRole(userId: UserId, role: RoomMember.Role): Result<Unit> {
+        val powerLevel = when (role) {
+            RoomMember.Role.ADMIN -> 100L
+            RoomMember.Role.MODERATOR -> 50L
+            RoomMember.Role.USER -> 0L
+        }
+        return runCatching {
+            innerRoom.updatePowerLevelForUser(userId.value, powerLevel)
         }
     }
 

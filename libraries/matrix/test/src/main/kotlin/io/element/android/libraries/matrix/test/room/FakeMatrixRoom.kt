@@ -86,6 +86,7 @@ class FakeMatrixRoom(
     private var unignoreResult: Result<Unit> = Result.success(Unit)
     private var userDisplayNameResult = Result.success<String?>(null)
     private var userAvatarUrlResult = Result.success<String?>(null)
+    private var userRoleResult = Result.success(RoomMember.Role.USER)
     private var updateMembersResult: Result<Unit> = Result.success(Unit)
     private var joinRoomResult = Result.success(Unit)
     private var inviteUserResult = Result.success(Unit)
@@ -100,6 +101,7 @@ class FakeMatrixRoom(
     private var setTopicResult = Result.success(Unit)
     private var updateAvatarResult = Result.success(Unit)
     private var removeAvatarResult = Result.success(Unit)
+    private var updateUserRoleResult = Result.success(Unit)
     private var toggleReactionResult = Result.success(Unit)
     private var retrySendMessageResult = Result.success(Unit)
     private var cancelSendResult = Result.success(Unit)
@@ -204,6 +206,14 @@ class FakeMatrixRoom(
 
     override suspend fun userAvatarUrl(userId: UserId): Result<String?> = simulateLongTask {
         userAvatarUrlResult
+    }
+
+    override suspend fun userRole(userId: UserId): Result<RoomMember.Role> {
+        return userRoleResult
+    }
+
+    override suspend fun updateUserRole(userId: UserId, role: RoomMember.Role): Result<Unit> {
+        return updateUserRoleResult
     }
 
     override suspend fun sendMessage(body: String, htmlBody: String?, mentions: List<Mention>) = simulateLongTask {
@@ -494,6 +504,14 @@ class FakeMatrixRoom(
 
     fun givenUserAvatarUrlResult(avatarUrl: Result<String?>) {
         userAvatarUrlResult = avatarUrl
+    }
+
+    fun givenUserRoleResult(role: Result<RoomMember.Role>) {
+        userRoleResult = role
+    }
+
+    fun givenUpdateUserRoleResult(result: Result<Unit>) {
+        updateUserRoleResult = result
     }
 
     fun givenJoinRoomResult(result: Result<Unit>) {
